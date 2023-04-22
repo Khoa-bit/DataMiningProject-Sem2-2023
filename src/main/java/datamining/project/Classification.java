@@ -36,7 +36,8 @@ public class Classification {
 			
 			//System.out.println(data.get(0).toString());
 			
-			data.setClassIndex(12);
+			data.setClassIndex(11);
+			System.out.println(data.classAttribute());
 			
 			String[] options = new String[2];
 			options[0] = "-R";
@@ -46,6 +47,8 @@ public class Classification {
 			nb.setOptions(options);
 			nb.setInputFormat(data);
 			Instances newData = Filter.useFilter(data, nb);
+			
+			System.out.println(newData.classAttribute());
 			
 			//System.out.println(newData.get(0).toString());
 			
@@ -58,10 +61,12 @@ public class Classification {
 			remove.setInputFormat(newData);
 			finalData = Filter.useFilter(newData, remove);
 			
+			System.out.println(finalData.classAttribute());
+			
 			//System.out.println(finalData.get(0).toString());
 			
 			
-			System.out.println(finalData.toString());
+			//System.out.println(finalData.toString());
 			
 			
 			
@@ -119,29 +124,7 @@ public class Classification {
 	public void prediction(Classifier c, Instances unlabeled) {
 		try {
 			//use importData(String path) instead when that is complete
-			
-			unlabeled.setClassIndex(12);
-		
-			String[] options = new String[2];
-			options[0] = "-R";
-			options[1] = "12";
-		
-			NumericToNominal nb = new NumericToNominal();
-			nb.setOptions(options);
-			nb.setInputFormat(unlabeled);
-			Instances newData = Filter.useFilter(unlabeled, nb);
-		
-		//System.out.println(newData.get(0).toString());
-		
-		
-			String[] optionsRemove = new String[2];
-			optionsRemove[0] = "-R";
-			optionsRemove[1] = "1";
-			Remove remove = new Remove();
-			remove.setOptions(optionsRemove);
-			remove.setInputFormat(newData);
-			Instances finalData = Filter.useFilter(newData, remove);
-			
+			//unlabeled must first be from importData
 			
 			Instances labeled = new Instances(unlabeled);
 			

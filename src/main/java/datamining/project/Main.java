@@ -3,6 +3,7 @@ package datamining.project;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
+import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
@@ -93,11 +94,11 @@ public class Main {
         }
         */
         Classification c = new Classification();
-        J48 tree = c.buildJ48();
-        NaiveBayes nb = c.buildNB();
-        Instances data = c.importData("filepath");
-        System.out.println(data.toString());
-        c.tenFold(nb, data);
+        Classifier tree = c.buildJ48();
+        Classifier nb = c.buildNB();
+        Instances data = c.importData(".\\healthcare-dataset-stroke-data-output.csv");
+        //System.out.println(data.toString());
+        c.tenFold(tree, data);
     }
 
     public static void fillBmiNa(String[][] mutTable) {
