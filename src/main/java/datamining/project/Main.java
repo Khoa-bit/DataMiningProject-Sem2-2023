@@ -2,6 +2,11 @@ package datamining.project;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
+
+import weka.classifiers.bayes.NaiveBayes;
+import weka.classifiers.trees.J48;
+import weka.core.Instances;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.io.FileReader;
@@ -51,7 +56,7 @@ public class Main {
 
     public static void main(String[] args) {
         @Nullable String[][] outputTable = null;
-
+        /*
         // Read input CSV
         try (CSVReader reader = new CSVReader(new FileReader(String.format("%s/src/main/resources/%s", projectDirectory, dataCsv)))) {
             List<String[]> rows = reader.readAll();
@@ -86,6 +91,13 @@ public class Main {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        */
+        Classification c = new Classification();
+        J48 tree = c.buildJ48();
+        NaiveBayes nb = c.buildNB();
+        Instances data = c.importData("filepath");
+        System.out.println(data.toString());
+        c.tenFold(nb, data);
     }
 
     public static void fillBmiNa(String[][] mutTable) {
