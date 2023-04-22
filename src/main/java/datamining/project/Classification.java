@@ -2,6 +2,8 @@ package datamining.project;
 
 import weka.core.converters.ConverterUtils.DataSource;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.Random;
 
 import weka.classifiers.Classifier;
@@ -37,7 +39,7 @@ public class Classification {
 			//System.out.println(data.get(0).toString());
 			
 			data.setClassIndex(11);
-			System.out.println(data.classAttribute());
+			//System.out.println(data.classAttribute());
 			
 			String[] options = new String[2];
 			options[0] = "-R";
@@ -48,7 +50,7 @@ public class Classification {
 			nb.setInputFormat(data);
 			Instances newData = Filter.useFilter(data, nb);
 			
-			System.out.println(newData.classAttribute());
+			//System.out.println(newData.classAttribute());
 			
 			//System.out.println(newData.get(0).toString());
 			
@@ -61,7 +63,7 @@ public class Classification {
 			remove.setInputFormat(newData);
 			finalData = Filter.useFilter(newData, remove);
 			
-			System.out.println(finalData.classAttribute());
+			//System.out.println(finalData.classAttribute());
 			
 			//System.out.println(finalData.get(0).toString());
 			
@@ -114,11 +116,22 @@ public class Classification {
 		try {
 			Evaluation eval = new Evaluation(data);
 			eval.crossValidateModel(c, data, 10, new Random(1));
+			
 			System.out.println(eval.toSummaryString());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public Classifier train(Classifier c, Instances data) {
+		try {
+			c.buildClassifier(data);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return c;
 	}
 	
 	public void prediction(Classifier c, Instances unlabeled) {
@@ -127,13 +140,23 @@ public class Classification {
 			//unlabeled must first be from importData
 			
 			Instances labeled = new Instances(unlabeled);
+			//System.out.println(unlabeled.instance(1));
+			//System.out.println(labeled.instance(0));
+			System.out.println(labeled.classAttribute());
 			
 			for (int i = 0; i < unlabeled.numInstances(); i++) {
 				   double clsLabel = c.classifyInstance(unlabeled.instance(i));
+				   //System.out.println(clsLabel);
+				   //System.out.println(unlabeled.classAttribute().value((int) clsLabel));
 				   labeled.instance(i).setClassValue(clsLabel);
+				   System.out.println(labeled.instance(i).stringValue(10));
+				   
+				   
 			}
-			
+			//System.out.println(labeled.toString());
+			//System.out.println(labeled);
 			//write to a new csv
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();

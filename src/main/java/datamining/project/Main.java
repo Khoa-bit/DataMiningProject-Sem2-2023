@@ -97,8 +97,10 @@ public class Main {
         Classifier tree = c.buildJ48();
         Classifier nb = c.buildNB();
         Instances data = c.importData(".\\healthcare-dataset-stroke-data-output.csv");
-        //System.out.println(data.toString());
+        //System.out.println(data.attribute(13));
         c.tenFold(tree, data);
+        //Classifier predict = c.train(tree, data);
+        //c.prediction(predict, c.importData(".\\pure_dataset.csv"));
     }
 
     public static void fillBmiNa(String[][] mutTable) {
