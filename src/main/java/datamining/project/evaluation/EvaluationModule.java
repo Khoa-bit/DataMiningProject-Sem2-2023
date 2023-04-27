@@ -2,18 +2,17 @@ package datamining.project.evaluation;
 
 import weka.core.Instances;
 import weka.classifiers.Evaluation;
+import weka.classifiers.AbstractClassifier;
 
 import java.util.Random;
-
-import datamining.project.classification.AbstractClassification;
 
 public class EvaluationModule {
     private Evaluation evalCore;
     private Instances dataInstance;
-    private AbstractClassification targetClassifer;
+    private AbstractClassifier targetClassifier;
 
-    public EvaluationModule(AbstractClassification a, Instances b) {
-        this.targetClassifer = a;
+    public EvaluationModule(AbstractClassifier a, Instances b) {
+        this.targetClassifier = a;
         this.dataInstance = b;
 
         try {
@@ -26,10 +25,9 @@ public class EvaluationModule {
     }
 
     public void cross10FoldEval() {
-        var classifier = this.targetClassifer.getClassifier();
         try {
             this.evalCore.crossValidateModel(
-                classifier, 
+                this.targetClassifier, 
                 this.dataInstance, 
                 10, 
                 new Random(1)
