@@ -3,6 +3,7 @@ package datamining.project;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
+import datamining.project.Classifier.J48_Classifier;
 import weka.classifiers.Classifier;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.trees.J48;
@@ -93,6 +94,7 @@ public class Main {
             ex.printStackTrace();
         }
         */
+        //J48_Classifier j = new J48_Classifier();
         Classification c = new Classification();
         Classifier tree = c.buildJ48();
         Classifier nb = c.buildNB();
