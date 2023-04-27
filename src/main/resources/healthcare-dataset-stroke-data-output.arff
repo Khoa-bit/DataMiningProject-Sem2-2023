@@ -1,4 +1,22 @@
-id,gender,age,hypertension,heart_disease,ever_married,work_type,Residence_type,avg_glucose_level,bmi,smoking_status,stroke,BMI_cat,Age_cat,AVG_Glucose_cat
+@relation healthcare-dataset-stroke-data
+
+@attribute id numeric
+@attribute gender {Male,Female,Other}
+@attribute age numeric
+@attribute hypertension numeric
+@attribute heart_disease numeric
+@attribute ever_married {Yes,No}
+@attribute work_type {Private,Self-employed,Govt_job,children,Never_worked}
+@attribute Residence_type {Urban,Rural}
+@attribute avg_glucose_level numeric
+@attribute bmi string
+@attribute smoking_status {'formerly smoked','never smoked',smokes,Unknown}
+@attribute stroke numeric
+@attribute BMI_cat {Underweight,Ideal,Overweight,Obesity}
+@attribute Age_cat {Children,Teens,Adults,'Mid Adults',Elderly}
+@attribute AVG_Glucose_cat {Low,Normal,High,'Very High'}
+
+@data
 9046,Male,67,0,1,Yes,Private,Urban,228.69,36.6,'formerly smoked',1,Underweight,Elderly,High
 51676,Female,61,0,0,Yes,Self-employed,Rural,202.21,33.7,'never smoked',1,Overweight,Elderly,High
 31112,Male,80,0,1,Yes,Private,Rural,105.92,32.5,'never smoked',1,Underweight,Elderly,Normal
