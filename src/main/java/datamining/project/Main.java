@@ -74,14 +74,14 @@ public class Main {
             // Output to CSV file
             CSVSaver csvSaver = new CSVSaver();
             csvSaver.setInstances(binData);
-            csvSaver.setFile(new File(String.format("%s/src/main/resources/%s", projectDirectory, outputCsv)));
+            csvSaver.setFile(new File(String.format("%s/src/main/resources/output/%s", projectDirectory, outputCsv)));
             csvSaver.writeBatch();
             System.out.println("Save to CSV successfully!");
 
             // Output to ARFF file
             ArffSaver arffSaver = new ArffSaver();
             arffSaver.setInstances(binData);
-            arffSaver.setFile(new File(String.format("%s/src/main/resources/%s", projectDirectory, outputArff)));
+            arffSaver.setFile(new File(String.format("%s/src/main/resources/output/%s", projectDirectory, outputArff)));
             arffSaver.writeBatch();
             System.out.println("Save to ARFF successfully!");
         } catch (IOException e) {
