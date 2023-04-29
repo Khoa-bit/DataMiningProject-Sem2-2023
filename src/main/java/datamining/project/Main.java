@@ -3,8 +3,10 @@ package datamining.project;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
+import datamining.project.Classifier.J48Project;
 import datamining.project.Classifier.J48_Classifier;
 import weka.classifiers.Classifier;
+import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class Main {
     // Categorical Features: gender, ever_married, work_type, Residence_type, smoking_status
@@ -93,16 +96,37 @@ public class Main {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        */
-        //J48_Classifier j = new J48_Classifier();
+        *//*
+        J48_Classifier j = new J48_Classifier();
         Classification c = new Classification();
         Classifier tree = c.buildJ48();
         Classifier nb = c.buildNB();
         Instances data = c.importData(".\\healthcare-dataset-stroke-data-output.csv");
         //System.out.println(data.attribute(13));
-        c.tenFold(tree, data);
+        c.tenFold(tree, data);*/
+        
         //Classifier predict = c.train(tree, data);
         //c.prediction(predict, c.importData(".\\pure_dataset.csv"));
+        
+        J48Project c = new J48Project();
+        Instances data = c.importData(".\\healthcare-dataset-stroke-data-output.csv");
+        try {
+			c.buildClassifier();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        try {
+			Evaluation eval = new Evaluation(data);
+			eval.crossValidateModel(c, data, 10, new Random(1));
+			
+			System.out.println(eval.toSummaryString());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        c.prediction(c.importData(".\\pure_dataset.csv"));
+        
     }
 
     public static void fillBmiNa(String[][] mutTable) {
