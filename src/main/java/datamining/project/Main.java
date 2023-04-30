@@ -109,9 +109,10 @@ public class Main {
         //c.prediction(predict, c.importData(".\\pure_dataset.csv"));
         
         J48Project c = new J48Project();
-        Instances data = c.importData(".\\healthcare-dataset-stroke-data-output.csv");
+        //Instances data = c.importData(".\\healthcare-dataset-stroke-data-output.csv");
+        Instances data = c.importData(".\\arff.arff");
         try {
-			c.buildClassifier();
+			//c.buildClassifier();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -125,7 +126,7 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        c.prediction(c.importData(".\\pure_dataset.csv"));
+        //c.prediction(c.importData(".\\pure_dataset.csv"));
         
     }
 

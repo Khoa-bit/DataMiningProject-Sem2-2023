@@ -20,4 +20,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/main/resources/arff.arff</name>
+			<type>1</type>
+			<location>C:/Users/hocla/Documents/GitHub/DataMiningProject-Sem2-2023/src/main/resources/arff.arff</location>
+		</link>
+	</linkedResources>
 </projectDescription>
