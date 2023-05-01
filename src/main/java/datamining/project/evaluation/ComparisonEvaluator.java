@@ -13,9 +13,9 @@ public class ComparisonEvaluator {
     private long startTime, runtime1, runtime2;
 
     public ComparisonEvaluator(AbstractClassifier classifier1, AbstractClassifier classifier2, Instances data) {
-        dataInstance = data;
-        this.evaluator1 = new EvaluationModule(classifier1, data);
-        this.evaluator2 = new EvaluationModule(classifier2, data);
+        this.dataInstance = data;
+        this.evaluator1 = new EvaluationModule(classifier1, this.dataInstance);
+        this.evaluator2 = new EvaluationModule(classifier2, this.dataInstance);
     }
 
     private void RunEvaluation() {
@@ -57,6 +57,7 @@ public class ComparisonEvaluator {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
+
+
 }
