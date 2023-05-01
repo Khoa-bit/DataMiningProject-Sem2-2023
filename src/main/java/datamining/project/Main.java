@@ -5,6 +5,7 @@ import com.opencsv.CSVWriter;
 
 import datamining.project.Classifier.J48Project;
 import datamining.project.Classifier.J48_Classifier;
+import datamining.project.Classifier.NBProject;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
@@ -109,8 +110,11 @@ public class Main {
         //c.prediction(predict, c.importData(".\\pure_dataset.csv"));
         
         J48Project c = new J48Project();
+        NBProject nb = new NBProject();
         //Instances data = c.importData(".\\healthcare-dataset-stroke-data-output.csv");
         Instances data = c.importData(".\\arff.arff");
+        Instances data2 = nb.importData(".\\arff.arff");
+        //System.out.println(data2);
         try {
 			//c.buildClassifier();
 		} catch (Exception e) {
@@ -118,8 +122,8 @@ public class Main {
 			e.printStackTrace();
 		}
         try {
-			Evaluation eval = new Evaluation(data);
-			eval.crossValidateModel(c, data, 10, new Random(1));
+			Evaluation eval = new Evaluation(data2);
+			eval.crossValidateModel(nb, data2, 10, new Random(1));
 			
 			System.out.println(eval.toSummaryString());
 		} catch (Exception e) {

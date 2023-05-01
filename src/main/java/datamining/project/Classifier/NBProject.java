@@ -1,11 +1,8 @@
 package datamining.project.Classifier;
 
-import java.util.Random;
-
 import weka.classifiers.AbstractClassifier;
-import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
-import weka.classifiers.trees.J48;
+import weka.classifiers.bayes.NaiveBayes;
+
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -13,45 +10,40 @@ import weka.core.Utils;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.NumericToNominal;
-import weka.filters.unsupervised.attribute.StringToNominal;
 import weka.filters.unsupervised.attribute.Remove;
+import weka.filters.unsupervised.attribute.StringToNominal;
 
-public class J48Project extends AbstractClassifier {
-	
+public class NBProject extends AbstractClassifier {
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private J48 tree = null;
+
+	private NaiveBayes nb = null;
 	private Instances data = null;
 	
-	public J48Project() {
-		String[] options = new String[4];
-		options[0] = "-C";
-		options[1] = "0.25";
-		options[2] = "-M";
-		options[3] = "2";
+	public NBProject() {
 		//J48 tree = null;
 		try {
-			tree = new J48();
-			tree.setOptions(options);
+			nb = new NaiveBayes();
 			//tree.buildClassifier(data);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("J48");
+			System.out.println("NB");
 		}
 	}
 	
 	@Override
 	public void buildClassifier(Instances data) throws Exception {
 		// TODO Auto-generated method stub
-		tree.buildClassifier(data);
+		nb.buildClassifier(data);
 	}
 	
 	public void buildClassifier() throws Exception {
 		// TODO Auto-generated method stub
-		tree.buildClassifier(data);
+		nb.buildClassifier(data);
 	}
 	
 	public Instances importData(String path) {
@@ -93,7 +85,25 @@ public class J48Project extends AbstractClassifier {
 			Remove remove2 = new Remove();
 			remove2.setOptions(optionsRemove2);
 			remove2.setInputFormat(newData);
-			finalData = Filter.useFilter(newData, remove2);
+			newData = Filter.useFilter(newData, remove2);
+			
+			optionsRemove = new String[2];
+			optionsRemove[0] = "-R";
+			optionsRemove[1] = "8";
+			remove = new Remove();
+			remove.setOptions(optionsRemove);
+			remove.setInputFormat(newData);
+			newData = Filter.useFilter(newData, remove);
+			
+			optionsRemove = new String[2];
+			optionsRemove[0] = "-R";
+			optionsRemove[1] = "2";
+			remove = new Remove();
+			remove.setOptions(optionsRemove);
+			remove.setInputFormat(newData);
+			newData = Filter.useFilter(newData, remove);
+			
+			finalData = newData;
 			
 			//System.out.println(finalData.classAttribute());
 			
@@ -153,7 +163,7 @@ public class J48Project extends AbstractClassifier {
 	
 	public double classifyInstance(Instance instance) throws Exception {
 
-	    double[] dist = tree.distributionForInstance(instance);
+	    double[] dist = nb.distributionForInstance(instance);
 	    if (dist == null) {
 	      throw new Exception("Null distribution predicted");
 	    }
@@ -181,8 +191,8 @@ public class J48Project extends AbstractClassifier {
 	    }
 	  }
 	
-	public J48 getJ48() {
-		return tree;
+	public NaiveBayes getNB() {
+		return nb;
 	}
 
 }
