@@ -24,19 +24,23 @@ public class EvaluationModule {
         }
     }
 
+    public String GetClassifierName() {
+        return targetClassifier.getClass().getName();
+    }
+
     public void cross10FoldEval() {
         try {
             this.evalCore.crossValidateModel(
-                this.targetClassifier, 
-                this.dataInstance, 
-                10, 
-                new Random(1)
-            );
-        }
-        catch (Exception e) {
+                    this.targetClassifier,
+                    this.dataInstance,
+                    10,
+                    new Random(1));
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public Evaluation getEvaluationCore() { return this.evalCore; }
+    public Evaluation getEvaluationCore() {
+        return this.evalCore;
+    }
 }
