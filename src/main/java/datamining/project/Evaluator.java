@@ -4,13 +4,13 @@ import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.functions.Logistic;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.filters.unsupervised.attribute.Remove;
 import java.util.Random;
 
 public class Evaluator {
-
     public static void main(String[] args) throws Exception {
 
         // Load the data
@@ -22,7 +22,7 @@ public class Evaluator {
             data.setClassIndex(data.numAttributes() - 1);
 
         // Create a classifier
-        Classifier classifier = new Logistic();
+        Classifier classifier = new TestClassifier();
 
         // Create a filter for removing attributes
         Remove removeFilter = new Remove();
