@@ -1,11 +1,13 @@
 package datamining.project;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
-import org.jetbrains.annotations.Nullable;
+import weka.core.Attribute;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.converters.ArffSaver;
+import weka.core.converters.CSVLoader;
+import weka.core.converters.CSVSaver;
 
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,6 +24,9 @@ public class Main {
     static final String dataCsv = "healthcare-dataset-stroke-data.csv";
     // Output CSV
     static final String outputCsv = "healthcare-dataset-stroke-data-output.csv";
+
+    // Output ARFF
+    static final String outputArff = "healthcare-dataset-stroke-data-output.arff";
 
     // Map column with its ordering indices
     enum TableColumnIndex {
@@ -50,49 +55,45 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        @Nullable String[][] outputTable = null;
-
-        // Read input CSV
-        try (CSVReader reader = new CSVReader(new FileReader(String.format("%s/src/main/resources/%s", projectDirectory, dataCsv)))) {
-            List<String[]> rows = reader.readAll();
-            String[][] table = rows.toArray(new String[rows.size()][]);
+        try {
+            CSVLoader csvLoader = new CSVLoader();
+            csvLoader.setSource(new File(String.format("%s/src/main/resources/%s", projectDirectory, dataCsv)));
+            Instances data = csvLoader.getDataSet();
 
             // fill "N/A" with the median of the bmi column
-            fillBmiNa(table);
+            fillBmiNa(data);
 
             // Applied binning for all the continuous values
-            String[][] tableWithBins = binData(table);
+            Instances binData = binData(data);
 
             // print the table
-            printTable(tableWithBins);
+            // printTable(tableWithBins);
+            System.out.println(binData);
 
-            outputTable = tableWithBins;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
 
-        // Write output CSV
-        try (CSVWriter csvWriter = new CSVWriter(new FileWriter(String.format("%s/src/main/resources/%s", projectDirectory, outputCsv)))) {
-            if (outputTable == null) {
-                throw new RuntimeException("Final outputTable is null");
-            }
+            // Output to CSV file
+            CSVSaver csvSaver = new CSVSaver();
+            csvSaver.setInstances(binData);
+            csvSaver.setFile(new File(String.format("%s/src/main/resources/output/%s", projectDirectory, outputCsv)));
+            csvSaver.writeBatch();
+            System.out.println("Save to CSV successfully!");
 
-            // Write the data table to the CSV file
-            for (String[] row : outputTable) {
-                csvWriter.writeNext(row);
-            }
-
-            System.out.println("CSV file has been exported successfully!");
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            // Output to ARFF file
+            ArffSaver arffSaver = new ArffSaver();
+            arffSaver.setInstances(binData);
+            arffSaver.setFile(new File(String.format("%s/src/main/resources/output/%s", projectDirectory, outputArff)));
+            arffSaver.writeBatch();
+            System.out.println("Save to ARFF successfully!");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static void fillBmiNa(String[][] mutTable) {
-        // Convert the bmi values to doubles and collect the non-missing ones
+    public static void fillBmiNa(Instances instances) {
+        // Create an array of all the available bmi values
         List<Double> bmiValues = new ArrayList<>();
-        for (int i = 1; i < mutTable.length; i++) { // start at 1 to skip header row
-            String bmiString = mutTable[i][TableColumnIndex.BMI.index];
+        for (int i = 0; i < instances.numInstances(); i++) {
+            String bmiString = instances.instance(i).stringValue(TableColumnIndex.BMI.index);
             if (!bmiString.equals("N/A")) {
                 bmiValues.add(Double.parseDouble(bmiString));
             }
@@ -114,17 +115,17 @@ public class Main {
         }
 
         // Fill in the missing bmi values with the median
-        for (int i = 1; i < mutTable.length; i++) { // start at 1 to skip header row
-            String bmiString = mutTable[i][TableColumnIndex.BMI.index];
+        for (int i = 0; i < instances.numInstances(); i++) {
+            String bmiString = instances.instance(i).stringValue(TableColumnIndex.BMI.index);
             if (bmiString.equals("N/A")) {
-                mutTable[i][TableColumnIndex.BMI.index] = Double.toString(median);
+                instances.instance(i).setValue(TableColumnIndex.BMI.index, median);
             }
         }
 
         System.out.println("BMI median: " + median);
     }
 
-    public static String[][] binData(String[][] table) {
+    public static Instances binData(Instances data) {
         // Define binning parameters
         int[] bmiBins = {0, 19, 25, 30, 10000};
         String[] bmiLabels = {"Underweight", "Ideal", "Overweight", "Obesity"};
@@ -135,22 +136,17 @@ public class Main {
         int[] glucoseBins = {0, 90, 160, 230, 500};
         String[] glucoseLabels = {"Low", "Normal", "High", "Very High"};
 
-        // Create output table with additional columns for bin labels
-        int numColumns = table[0].length;
-        int numRows = table.length;
-        String[][] output = new String[numRows][numColumns + 3];
+        // Create output Instances object with additional attributes for bin labels
+        Instances output = new Instances(data);
 
-        // Copy existing table to output table
-        for (int i = 0; i < numRows; i++) {
-            for (int j = 0; j < numColumns; j++) {
-                output[i][j] = table[i][j];
-            }
-        }
+        output.insertAttributeAt(new Attribute("BMI_cat", Arrays.asList(bmiLabels)), output.numAttributes());
+        output.insertAttributeAt(new Attribute("Age_cat", Arrays.asList(ageLabels)), output.numAttributes());
+        output.insertAttributeAt(new Attribute("AVG_Glucose_cat", Arrays.asList(glucoseLabels)), output.numAttributes());
 
         // Bin and label BMI values
-        output[0][numColumns] = "BMI_cat";
-        for (int i = 1; i < numRows; i++) { // start at 1 to skip header row
-            double bmi = Double.parseDouble(table[i][TableColumnIndex.BMI.index]);
+        for (int i = 0; i < output.numInstances(); i++) {
+            Instance instance = output.instance(i);
+            double bmi = instance.value(TableColumnIndex.BMI.index);
             int binIndex = Arrays.binarySearch(bmiBins, (int) Math.round(bmi));
 
             // Get insertion points between bins
@@ -158,13 +154,13 @@ public class Main {
                 binIndex = -(binIndex + 1) - 1;
             }
 
-            output[i][numColumns] = bmiLabels[binIndex];
+            instance.setValue(output.attribute("BMI_cat"), bmiLabels[binIndex]);
         }
 
         // Bin and label age values
-        output[0][numColumns + 1] = "Age_cat";
-        for (int i = 1; i < numRows; i++) { // start at 1 to skip header row
-            double age = Double.parseDouble(table[i][TableColumnIndex.AGE.index]);
+        for (int i = 0; i < output.numInstances(); i++) {
+            Instance instance = output.instance(i);
+            double age = instance.value(TableColumnIndex.AGE.index);
             int binIndex = Arrays.binarySearch(ageBins, (int) Math.round(age));
 
             // Get insertion points between bins
@@ -172,13 +168,13 @@ public class Main {
                 binIndex = -(binIndex + 1) - 1;
             }
 
-            output[i][numColumns + 1] = ageLabels[binIndex];
+            instance.setValue(output.attribute("Age_cat"), ageLabels[binIndex]);
         }
 
         // Bin and label glucose values
-        output[0][numColumns + 2] = "AVG_Glucose_cat";
-        for (int i = 1; i < numRows; i++) { // start at 1 to skip header row
-            double glucose = Double.parseDouble(table[i][TableColumnIndex.AVG_GLUCOSE_LEVEL.index]);
+        for (int i = 0; i < output.numInstances(); i++) {
+            Instance instance = output.instance(i);
+            double glucose = instance.value(TableColumnIndex.AVG_GLUCOSE_LEVEL.index);
             int binIndex = Arrays.binarySearch(glucoseBins, (int) Math.round(glucose));
 
             // Get insertion points between bins
@@ -186,53 +182,9 @@ public class Main {
                 binIndex = -(binIndex + 1) - 1;
             }
 
-            output[i][numColumns + 2] = glucoseLabels[binIndex];
+            instance.setValue(output.attribute("AVG_Glucose_cat"), glucoseLabels[binIndex]);
         }
 
         return output;
-    }
-
-    public static void printTable(String[][] table) {
-        // find the maximum width of each column
-        int[] maxColumnWidths = new int[table[0].length];
-        for (String[] row : table) {
-            for (int i = 0; i < row.length; i++) {
-                if (row[i] == null) {
-                    maxColumnWidths[i] = Math.max(maxColumnWidths[i], 10);
-                } else {
-                    maxColumnWidths[i] = Math.max(maxColumnWidths[i], row[i].length());
-                }
-            }
-        }
-
-        // print the table header
-        System.out.print("+");
-        for (int maxColumnWidth : maxColumnWidths) {
-            System.out.print("-".repeat(maxColumnWidth + 2) + "+");
-        }
-        System.out.println();
-
-        // print the table contents
-        for (int j = 0; j < table.length; j++) {
-            System.out.print("| ");
-            for (int i = 0; i < table[j].length; i++) {
-                System.out.printf("%-" + maxColumnWidths[i] + "s | ", table[j][i]);
-            }
-            System.out.println();
-            if (j == 0) {
-                System.out.print("+");
-                for (int maxColumnWidth : maxColumnWidths) {
-                    System.out.print("-".repeat(maxColumnWidth + 2) + "+");
-                }
-                System.out.println();
-            }
-        }
-
-        // print the table footer
-        System.out.print("+");
-        for (int maxColumnWidth : maxColumnWidths) {
-            System.out.print("-".repeat(maxColumnWidth + 2) + "+");
-        }
-        System.out.println();
     }
 }
