@@ -1,4 +1,4 @@
-package datamining.project;
+package datamining.project.misc_testings;
 
 import weka.core.Attribute;
 import weka.core.Instance;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Main {
+public class OldPreprocessTest {
     // Categorical Features: gender, ever_married, work_type, Residence_type, smoking_status
     // Binary Numerical Features: hypertension,heart_disease, stroke
     // Continuous Numerical Features: age, avg_glucose_level, bmi
