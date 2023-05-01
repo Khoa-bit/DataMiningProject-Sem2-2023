@@ -1,6 +1,6 @@
-package datamining.project;
+package datamining.project._misctestings;
 
-import datamining.project.evaluation.ComparisonEvaluator;
+import datamining.project.evaluation.ResultSummarizer;
 import weka.classifiers.rules.OneR;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
@@ -14,8 +14,9 @@ public class EvaluationTest {
             if (data.classIndex() == -1) {
                 data.setClassIndex(data.numAttributes() - 1);
             }
-            ComparisonEvaluator compare = new ComparisonEvaluator(new J48(), new OneR(), data);
-            compare.GetComparison();
+            ResultSummarizer compare = new ResultSummarizer(new J48(), new OneR(), data);
+            compare.runEvals();
+            compare.reportResults();
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -13,10 +13,6 @@ import weka.filters.unsupervised.attribute.StringToNominal;
 import weka.filters.unsupervised.attribute.Remove;
 
 public class J48Tree extends AbstractClassifier {
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private J48 tree = null;
 	private Instances dataInstance = null;
@@ -115,9 +111,7 @@ public class J48Tree extends AbstractClassifier {
 			StringToNominal sn = new StringToNominal();
 			sn.setOptions(options);
 			sn.setInputFormat(unlabeled);
-			Instances newUnlabeled = Filter.useFilter(unlabeled, sn);
-			
-			
+			Instances newUnlabeled = Filter.useFilter(unlabeled, sn);	
 			Instances labeled = new Instances(newUnlabeled);
 			//System.out.println(unlabeled.instance(1));
 			//System.out.println(labeled.instance(0));
@@ -130,8 +124,6 @@ public class J48Tree extends AbstractClassifier {
 				   //System.out.println(unlabeled.classAttribute().value((int) clsLabel));
 				   labeled.instance(i).setClassValue(clsLabel);
 				   System.out.println(labeled.instance(i).stringValue(10));
-				   
-				   
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

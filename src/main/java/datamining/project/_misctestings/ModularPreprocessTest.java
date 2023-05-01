@@ -1,4 +1,4 @@
-package datamining.project.misc_testings;
+package datamining.project._misctestings;
 
 import datamining.project.preprocessing.DataPreprocessor;
 

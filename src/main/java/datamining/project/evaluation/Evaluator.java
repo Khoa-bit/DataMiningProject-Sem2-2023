@@ -5,13 +5,15 @@ import weka.classifiers.Evaluation;
 import weka.classifiers.AbstractClassifier;
 
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-public class EvaluationModule {
+public class Evaluator {
+    private long duration;
     private Evaluation evalCore;
     private Instances dataInstance;
     private AbstractClassifier targetClassifier;
 
-    public EvaluationModule(AbstractClassifier a, Instances b) {
+    public Evaluator(AbstractClassifier a, Instances b) {
         this.targetClassifier = a;
         this.dataInstance = b;
 
@@ -24,11 +26,12 @@ public class EvaluationModule {
         }
     }
 
-    public String GetClassifierName() {
+    public String getClassifierName() {
         return targetClassifier.getClass().getName();
     }
 
-    public void cross10FoldEval() {
+    public void cross10FoldEvaluation() {
+        var startMark = System.nanoTime();
         try {
             this.evalCore.crossValidateModel(
                     this.targetClassifier,
@@ -38,9 +41,12 @@ public class EvaluationModule {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        this.duration = TimeUnit.MILLISECONDS.convert(System.nanoTime() - startMark, TimeUnit.NANOSECONDS);
     }
 
     public Evaluation getEvaluationCore() {
         return this.evalCore;
     }
+    public long getRuntimeDuration() { return this.duration; }
 }

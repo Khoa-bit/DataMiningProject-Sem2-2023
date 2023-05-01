@@ -12,6 +12,7 @@ import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 import weka.core.converters.CSVLoader;
 import weka.core.converters.CSVSaver;
+import weka.core.converters.ConverterUtils.DataSource;
 
 public class DataPreprocessor {
     
@@ -34,6 +35,7 @@ public class DataPreprocessor {
     }
 
     public void loadCSVFile() {
+        var isSuccess = false;
         var preferredPath = this.isTestMode ? devInputPath : realInputPath;
         var loader = new CSVLoader();
         try {
@@ -46,10 +48,18 @@ public class DataPreprocessor {
             ));
 
             this.dataInstance = loader.getDataSet();
+            isSuccess = true;
         }
 
         catch (Exception e) {
-            e.printStackTrace();
+            System.out.printf("[ERROR] Can not find file name \"%s\"!\n", this.inputFileName);
+        }
+
+        finally {
+            if (!isSuccess) {
+                System.out.printf("[MAIN] Exiting the program with code 1...\n\n");
+                System.exit(1);
+            }
         }
     }
 
@@ -60,6 +70,11 @@ public class DataPreprocessor {
 
     public void reportData() {
         System.out.println(this.binningDataInstance);
+    }
+
+    public void generateFiles() {
+        saveNewCSV();
+        outputARFF();
     }
 
     public void saveNewCSV() {
@@ -76,7 +91,7 @@ public class DataPreprocessor {
             ));
 
             csvSaver.writeBatch();
-            System.out.println("CSV saved successfully!");
+            System.out.println("[PREPROCESSING] CSV file modified and saved successfully!");
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -95,7 +110,7 @@ public class DataPreprocessor {
                 this.outputARFFName)
             ));
             arffSaver.writeBatch();
-            System.out.println("ARFF file generated!");
+            System.out.println("[PREPROCESSING] ARFF file generated successfully!");
         }
 
         catch (Exception e) {
@@ -136,7 +151,7 @@ public class DataPreprocessor {
             }
         }
 
-        System.out.println("BMI median: " + median);
+        System.out.println("[PREPROCESSING] Calculated BMI median from the desired dataset is: " + median);
     }
 
     public Instances binData(Instances data) {
@@ -145,10 +160,10 @@ public class DataPreprocessor {
         String[] bmiLabels = {"Underweight", "Ideal", "Overweight", "Obesity"};
 
         int[] ageBins = {0, 13, 18, 45, 60, 200};
-        String[] ageLabels = {"Children", "Teens", "Adults", "Mid Adults", "Elderly"};
+        String[] ageLabels = {"Children", "Teen", "Adult", "MidAdult", "Elderly"};
 
         int[] glucoseBins = {0, 90, 160, 230, 500};
-        String[] glucoseLabels = {"Low", "Normal", "High", "Very High"};
+        String[] glucoseLabels = {"Low", "Normal", "High", "VeryHigh"};
 
         // Create output Instances object with additional attributes for bin labels
         var output = new Instances(data);
@@ -235,5 +250,40 @@ public class DataPreprocessor {
         return filename.substring(0, extensionIndex);
     }
 
+    public Instances getARFFData() {
+        Instances arffInstances = null;
+        var isSuccess = true;
+        try {
+            var preferredPath = this.isTestMode ? devOutputPath : realOutputPath;
+            var src = new DataSource(
+                String.format(
+                    preferredPath,
+                    System.getProperty("user.dir"),
+                    this.outputARFFName
+                )
+            );
+            arffInstances = src.getDataSet();
+
+            if (arffInstances.classIndex() == -1) {
+                arffInstances.setClassIndex(arffInstances.numAttributes() - 1);
+            }
+        }
+
+        catch (Exception e) {
+            isSuccess = false;
+            System.out.printf("\n[ERROR] An error occurred while trying to import an ARFF file!\n");
+            e.printStackTrace();
+        }
+
+        finally {
+            if (!isSuccess) {
+                System.out.printf("\n[MAIN] Exiting the program with code 1...\n\n");
+                System.exit(1);
+            }
+        }
+
+        return arffInstances;
+    }
+    
     public Instances getBinningDataInstances() { return this.binningDataInstance; }
 }
