@@ -66,6 +66,22 @@ public class NBProject extends AbstractClassifier {
 			nb.setInputFormat(data);
 			Instances newData = Filter.useFilter(data, nb);
 			
+			options = new String[2];
+			options[0] = "-R";
+			options[1] = "4";
+			nb = new NumericToNominal();
+			nb.setOptions(options);
+			nb.setInputFormat(newData);
+			newData = Filter.useFilter(newData, nb);
+			
+			options = new String[2];
+			options[0] = "-R";
+			options[1] = "5";
+			nb = new NumericToNominal();
+			nb.setOptions(options);
+			nb.setInputFormat(newData);
+			newData = Filter.useFilter(newData, nb);
+			
 			//System.out.println(newData.classAttribute());
 			
 			//System.out.println(newData.get(0).toString());

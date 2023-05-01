@@ -114,7 +114,7 @@ public class Main {
         //Instances data = c.importData(".\\healthcare-dataset-stroke-data-output.csv");
         Instances data = c.importData(".\\arff.arff");
         Instances data2 = nb.importData(".\\arff.arff");
-        //System.out.println(data2);
+        System.out.println(data2);
         try {
 			//c.buildClassifier();
 		} catch (Exception e) {
