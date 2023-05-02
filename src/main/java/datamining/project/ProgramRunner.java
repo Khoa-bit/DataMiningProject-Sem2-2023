@@ -26,7 +26,9 @@ public class ProgramRunner {
             dataPrep.loadCSVFile();
             dataPrep.preprocessData();
             dataPrep.generateFiles();
-          
+
+        // System.out.println(dataPrep.getARFFData());
+
         System.out.printf("[MAIN] Exiting the program with code 0...\n\n");
     }
 }

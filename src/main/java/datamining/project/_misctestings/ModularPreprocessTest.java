@@ -8,7 +8,6 @@ public class ModularPreprocessTest {
             dp.loadCSVFile();
             dp.preprocessData();
             // dp.reportData();
-            dp.saveNewCSV();
-            dp.outputARFF();
+            dp.generateFiles();
     }
 }

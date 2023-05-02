@@ -72,47 +72,36 @@ public class DataPreprocessor {
         System.out.println(this.binningDataInstance);
     }
 
+    // Outputs preprocessed CSV and ARFF
     public void generateFiles() {
-        saveNewCSV();
-        outputARFF();
-    }
-
-    public void saveNewCSV() {
         var preferredPath = this.isTestMode ? devOutputPath : realOutputPath;
         var csvSaver = new CSVSaver();
+        var arffSaver = new ArffSaver();
         csvSaver.setInstances(this.binningDataInstance);
+        arffSaver.setInstances(this.binningDataInstance);
         
         try {
             csvSaver.setFile(new File(
                 String.format(
                     preferredPath, 
                     System.getProperty("user.dir"), 
-                    this.outputFileName)
+                    this.outputFileName
+                )
             ));
 
             csvSaver.writeBatch();
             System.out.println("[PREPROCESSING] CSV file modified and saved successfully!");
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
-    public void outputARFF() {
-        var preferredPath = this.isTestMode ? devOutputPath : realOutputPath;
-        var arffSaver = new ArffSaver();
-        arffSaver.setInstances(this.binningDataInstance);
-         
-        try {
             arffSaver.setFile(new File(
-                String.format(preferredPath,
-                System.getProperty("user.dir"),
-                this.outputARFFName)
+                String.format(
+                    preferredPath,
+                    System.getProperty("user.dir"),
+                    this.outputARFFName
+                )
             ));
             arffSaver.writeBatch();
             System.out.println("[PREPROCESSING] ARFF file generated successfully!");
         }
-
         catch (Exception e) {
             e.printStackTrace();
         }
@@ -267,6 +256,16 @@ public class DataPreprocessor {
             if (arffInstances.classIndex() == -1) {
                 arffInstances.setClassIndex(arffInstances.numAttributes() - 1);
             }
+
+            // String[] convertOptions = new String[2];
+            //     convertOptions[0] = "-R";
+            //     convertOptions[1] = "10";
+			
+            // StringToNominal s2n = new StringToNominal();
+			// s2n.setOptions(convertOptions);
+			// s2n.setInputFormat(arffInstances);
+
+            // arffInstances = Filter.useFilter(arffInstances, s2n);
         }
 
         catch (Exception e) {
