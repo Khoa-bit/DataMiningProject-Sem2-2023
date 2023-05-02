@@ -9,26 +9,14 @@ import weka.core.Instances;
 import weka.core.Utils;
 
 public class DecisionTableModel extends AbstractClassifier {
-    private Instances dataset;
     private Classifier classifier;
 
     public DecisionTableModel() {
         this.classifier = new DecisionTable();
     }
 
-    public Classifier buildClassifier() {
-        this.dataset.setClassIndex(this.dataset.numAttributes() - 1);
-        try {
-            this.classifier.buildClassifier(this.dataset);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return this.classifier;
-    }
-
     @Override
     public void buildClassifier(Instances inputData) throws Exception {
-        inputData.setClassIndex(inputData.numAttributes() - 1);
         try {
             this.classifier.buildClassifier(inputData);
         } catch (Exception e) {
@@ -37,7 +25,6 @@ public class DecisionTableModel extends AbstractClassifier {
     }
 
     public double classifyInstance(Instance instance) throws Exception {
-
 		double[] dist = this.classifier.distributionForInstance(instance);
 	    
 		if (dist == null) {

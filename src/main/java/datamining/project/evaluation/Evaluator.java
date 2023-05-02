@@ -7,7 +7,7 @@ import weka.classifiers.AbstractClassifier;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-public class Evaluator {
+public class Evaluator implements Runnable {
     private long duration;
     private Evaluation evalCore;
     private Instances dataInstance;
@@ -26,8 +26,9 @@ public class Evaluator {
         }
     }
 
-    public String getClassifierName() {
-        return targetClassifier.getClass().getName();
+    @Override
+    public void run() {
+        cross10FoldEvaluation();
     }
 
     public void cross10FoldEvaluation() {
@@ -43,6 +44,14 @@ public class Evaluator {
         }
 
         this.duration = TimeUnit.MILLISECONDS.convert(System.nanoTime() - startMark, TimeUnit.NANOSECONDS);
+    }
+
+    public String getClassifierName() {
+        return targetClassifier.getClass().getSimpleName();
+    }
+
+    public double getAccuracy() {
+        return this.evalCore.pctCorrect();
     }
 
     public Evaluation getEvaluationCore() {

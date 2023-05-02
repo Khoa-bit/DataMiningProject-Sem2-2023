@@ -1,5 +1,8 @@
 package datamining.project;
 
+import datamining.project.classification.DecisionTableModel;
+import datamining.project.classification.NaiveBayesAlgorithm;
+import datamining.project.evaluation.ResultSummarizer;
 import datamining.project.preprocessing.DataPreprocessor;
 import weka.core.WekaPackageManager;
 
@@ -27,8 +30,14 @@ public class ProgramRunner {
             dataPrep.preprocessData();
             dataPrep.generateFiles();
 
-        // System.out.println(dataPrep.getARFFData());
+        ResultSummarizer reporter = new ResultSummarizer(
+            new NaiveBayesAlgorithm(),
+            new DecisionTableModel(),
+            dataPrep.getARFFData()
+        );
 
-        System.out.printf("[MAIN] Exiting the program with code 0...\n\n");
+        reporter.runEvals();
+        reporter.reportResults();
+        System.out.printf("\n[MAIN] Exiting the program with code 0...\n");
     }
 }

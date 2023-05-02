@@ -13,6 +13,9 @@ import weka.core.converters.ArffSaver;
 import weka.core.converters.CSVLoader;
 import weka.core.converters.CSVSaver;
 import weka.core.converters.ConverterUtils.DataSource;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.NumericToNominal;
+import weka.filters.unsupervised.attribute.Remove;
 
 public class DataPreprocessor {
     
@@ -65,11 +68,7 @@ public class DataPreprocessor {
 
     public void preprocessData() {
         fillBmiNA(this.dataInstance);
-        this.binningDataInstance = binData(this.dataInstance);
-    }
-
-    public void reportData() {
-        System.out.println(this.binningDataInstance);
+        binData(this.dataInstance);
     }
 
     // Outputs preprocessed CSV and ARFF
@@ -103,6 +102,7 @@ public class DataPreprocessor {
             System.out.println("[PREPROCESSING] ARFF file generated successfully!");
         }
         catch (Exception e) {
+            System.out.println("[ERROR] An error occurred while generating output files! Details as below");
             e.printStackTrace();
         }
     }
@@ -143,7 +143,7 @@ public class DataPreprocessor {
         System.out.println("[PREPROCESSING] Calculated BMI median from the desired dataset is: " + median);
     }
 
-    public Instances binData(Instances data) {
+    public void binData(Instances data) {
         // Define binning parameters
         int[] bmiBins = {0, 19, 25, 30, 10000};
         String[] bmiLabels = {"Underweight", "Ideal", "Overweight", "Obesity"};
@@ -215,11 +215,15 @@ public class DataPreprocessor {
             }
             instance.setValue(output.attribute("AVG_Glucose_cat"), glucoseLabels[binIndex]);
         }
-        return output;
+
+        this.binningDataInstance = output;
     }
 
-    public String removeExtension(String s) {
+    public void reportData() {
+        System.out.println(this.binningDataInstance);
+    }
 
+    private String removeExtension(String s) {
         String separator = System.getProperty("file.separator");
         String filename;
     
@@ -240,7 +244,7 @@ public class DataPreprocessor {
     }
 
     public Instances getARFFData() {
-        Instances arffInstances = null;
+        Instances outputARFFData = null;
         var isSuccess = true;
         try {
             var preferredPath = this.isTestMode ? devOutputPath : realOutputPath;
@@ -251,21 +255,28 @@ public class DataPreprocessor {
                     this.outputARFFName
                 )
             );
-            arffInstances = src.getDataSet();
+            var arffInstances = src.getDataSet();
 
-            if (arffInstances.classIndex() == -1) {
-                arffInstances.setClassIndex(arffInstances.numAttributes() - 1);
-            }
-
-            // String[] convertOptions = new String[2];
-            //     convertOptions[0] = "-R";
-            //     convertOptions[1] = "10";
+            // Various Filtering/Converting operations (NEEDS REVISION)
+            var nb = new NumericToNominal();
+            int[] toBeConverted = {3, 4, 11};
+                nb.setAttributeIndicesArray(toBeConverted);
+                nb.setInputFormat(arffInstances);
+			var newARFFData = Filter.useFilter(arffInstances, nb);
 			
-            // StringToNominal s2n = new StringToNominal();
-			// s2n.setOptions(convertOptions);
-			// s2n.setInputFormat(arffInstances);
+            // Deletion operations
+            var remover = new Remove();
+            int[] toBeKept = {1, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14};
+            // int[] toBeRemoved = {9, 8, 2, 0};
+                // remover.setAttributeIndicesArray(toBeRemoved);
+                remover.setAttributeIndicesArray(toBeKept);
+                remover.setInvertSelection(true);
+                remover.setInputFormat(newARFFData);
+            newARFFData = Filter.useFilter(newARFFData, remover);
+            outputARFFData = newARFFData;
 
-            // arffInstances = Filter.useFilter(arffInstances, s2n);
+            // Set class index to "Stroke" attribute
+            outputARFFData.setClassIndex(7);
         }
 
         catch (Exception e) {
@@ -281,7 +292,20 @@ public class DataPreprocessor {
             }
         }
 
-        return arffInstances;
+        return outputARFFData;
+    }
+
+    public List<String> getDatasetAttributes(boolean shouldPrint) {
+        var atts = getARFFData().enumerateAttributes();
+        List<String> returnList = new ArrayList<>();
+        while (atts.hasMoreElements()) {
+            var currentAttribute = atts.nextElement();
+            System.out.println(currentAttribute.name());
+
+            if (shouldPrint) returnList.add(currentAttribute.name());
+        }
+
+        return returnList;
     }
     
     public Instances getBinningDataInstances() { return this.binningDataInstance; }
