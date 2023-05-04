@@ -42,8 +42,9 @@ public class Evaluator implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        var endMark = System.nanoTime();
 
-        this.duration = TimeUnit.MILLISECONDS.convert(System.nanoTime() - startMark, TimeUnit.NANOSECONDS);
+        this.duration = TimeUnit.MILLISECONDS.convert(endMark - startMark, TimeUnit.NANOSECONDS);
     }
 
     public String getClassifierName() {
