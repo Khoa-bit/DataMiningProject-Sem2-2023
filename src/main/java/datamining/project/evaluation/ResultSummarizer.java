@@ -62,7 +62,15 @@ public class ResultSummarizer {
         }
 
         else {
-            System.out.println(evaluator1.getEvaluationCore().toSummaryString());
+            try {
+                System.out.println(evaluator1.getEvaluationCore().toSummaryString());
+                System.out.println(evaluator1.getEvaluationCore().toClassDetailsString("=== Detailed Accuracy By Class ==="));
+                System.out.println(evaluator1.getEvaluationCore().toMatrixString("=== Confusion Matrix ==="));
+            }
+
+            catch (Exception e) { 
+                e.printStackTrace();
+            }
         }
         System.out.println(getRuntimeString(evaluator1.getRuntimeDuration()));
     }
@@ -73,7 +81,15 @@ public class ResultSummarizer {
         }
 
         else {
-            System.out.println(evaluator2.getEvaluationCore().toSummaryString());
+            try {
+                System.out.println(evaluator2.getEvaluationCore().toSummaryString());
+                System.out.println(evaluator2.getEvaluationCore().toClassDetailsString("=== Detailed Accuracy By Class ==="));
+                System.out.println(evaluator2.getEvaluationCore().toMatrixString("=== Confusion Matrix ==="));
+            }
+
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         System.out.println(getRuntimeString(evaluator2.getRuntimeDuration()));
     }
